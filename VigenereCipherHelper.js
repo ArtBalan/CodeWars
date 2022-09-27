@@ -1,29 +1,21 @@
+// https://www.codewars.com/kata/52d1bd3694d26f8d6e0000d3/train/javascript
+
 function VigenèreCipher(key, abc) {
   this.encode = function (str) {
-    console.log('encode : ' + str + ' ' + key + ' ' + abc)
     let keyLen = key.length;
     let strLen = str.length
     let tmpKey = key;
     if (keyLen > strLen) tmpKey = key.substring(0, strLen);
-
-    if (keyLen < strLen){
-      for(let i=0; i<strLen - keyLen; i++){
-        tmpKey += key[i%keyLen];
-      }
-    }
+    if (keyLen < strLen){ for(let i=0; i<strLen - keyLen; i++){ tmpKey += key[i%keyLen]; } }
     keyLen = tmpKey.length;
     let tempStr = '';    
-    for(let i=0; i<strLen; i++){
-      tempStr += this.encodeChar(str[i],tmpKey[i])
-    } 
-    console.log(tempStr)
+    for(let i=0; i<strLen; i++){ tempStr += this.encodeChar(str[i],tmpKey[i]);} 
     return tempStr
   };
   
   this.encodeChar = function(char,key){
     let charIndex = abc.indexOf(char);
     let keyIndex = abc.indexOf(key);
-    console.log(char, charIndex, keyIndex, key);
     if(charIndex!=-1 && keyIndex!=-1){
       charIndex+=keyIndex;
       if(charIndex>=abc.length) charIndex -= abc.length
@@ -32,20 +24,14 @@ function VigenèreCipher(key, abc) {
   };
 
   this.decode = function (str) {
-    console.log('decode : ' + str + ' ' + key + ' ' + abc)
     let keyLen = key.length;
     let strLen = str.length
     let tmpKey = key;
     if (keyLen > strLen) tmpKey = key.substring(0, strLen);
-    if (keyLen < strLen){
-      for(let i=0; i<strLen - keyLen; i++){
-        tmpKey += key[i%keyLen];
-      }
-    }
+    if (keyLen < strLen){ for(let i=0; i<strLen - keyLen; i++){ tmpKey += key[i%keyLen]; } }
     keyLen = tmpKey.length;
     tempStr = '';    
     for(let i=0; i<strLen; i++) tempStr += this.decodeChar(str[i],tmpKey[i])
-    console.log(tempStr)
     return tempStr
   };
 
@@ -55,7 +41,6 @@ function VigenèreCipher(key, abc) {
     if(charIndex!=-1 && keyIndex!=-1){
       charIndex-=keyIndex;
       if(charIndex<0) charIndex += abc.length
-      if(charIndex<0) console.log('proute')
       return abc[charIndex];
     } else return char 
   };

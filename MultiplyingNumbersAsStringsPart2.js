@@ -117,3 +117,8 @@ function multiply(a, b){
   return ((neg)? '-' : '' ) + tempStr;
 }
 
+console.log(multiply("-0.00", "0.0000") == "0");
+console.log(multiply("-0.01", "0.0000") == "0");
+console.log(multiply("2.01", "3.0000") == "6.03");
+console.log(multiply("2", "-3.000001") == "-6.000002");
+console.log(multiply("-5.0908", "-123.1") == "626.67748");

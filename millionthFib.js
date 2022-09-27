@@ -1,3 +1,5 @@
+// https://www.codewars.com/kata/53d40c1e2f13e331fc000c26
+
 function fib(n) {
   if(n == 0) return 0n;
   let f = [0n, 1n];
