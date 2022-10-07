@@ -1,5 +1,26 @@
 // https://blog.boot.dev/cryptography/how-sha-2-works-step-by-step-sha-256/
 
+function binAdd(a,b){
+  if(a.length !== b.length) return false;
+
+  let carry = '0';
+  let result = '';
+  let temp = '';
+  for(let i=a.length-1; i>=0; i--){
+    temp = '';
+    if(temp == '' && a[i]=='0' && b[i]=='0' && carry=='0') { temp = '0'; carry = '0'}
+    if(temp == '' && a[i]=='0' && b[i]=='0' && carry=='1') { temp = '1'; carry = '0'}
+    if(temp == '' && a[i]=='0' && b[i]=='1' && carry=='0') { temp = '1'; carry = '0'}
+    if(temp == '' && a[i]=='0' && b[i]=='1' && carry=='1') { temp = '0'; carry = '1'}
+    if(temp == '' && a[i]=='1' && b[i]=='0' && carry=='0') { temp = '1'; carry = '0'}
+    if(temp == '' && a[i]=='1' && b[i]=='0' && carry=='1') { temp = '0'; carry = '1'}
+    if(temp == '' && a[i]=='1' && b[i]=='1' && carry=='0') { temp = '0'; carry = '1'}
+    if(temp == '' && a[i]=='1' && b[i]=='1' && carry=='1') { temp = '1'; carry = '1'}
+    result = temp + result;
+  }
+  return result;
+}
+
 function splitInBlock(str, n){
   let newArr = [[]];
   let counter = 0;
@@ -46,6 +67,23 @@ function xor(a,b){
   } else {
     return 'error';
   }
+}
+
+function and(a,b){
+  if(a.length==b.length){
+    let temp = '';
+    for(let i=0; i<a.length;i++) temp += (a[i]==1 && b[i]==1)? '1' : '0';
+    return temp;
+  }else{
+    return false;
+  }
+}
+
+function not(a){
+  let temp = '';
+  for(let i=0; i<a.length;i++) temp += (a[i]==1)? '0' : '1';
+  return temp;
+
 }
 
 
@@ -103,8 +141,7 @@ function sha256(str){
 
   arr.forEach(chunk => {
 
-    while(chunk.length < 64) chunk.push(['00000000000000000000000000000000']);
-
+    while(chunk.length < 64) chunk.push('00000000000000000000000000000000');
     for(let i=16; i<64; i++){
       let wIm15 = chunk[i-15];
       let wIm2 = chunk[i-2];
@@ -124,9 +161,53 @@ function sha256(str){
 
       let s1 = xor(xor(wIm2r17,wIm2r19),wIm2s10);
 
+      let tempWi = binAdd(binAdd(binAdd(wIm16, s0),wIm7),s1)
+      chunk[i] = tempWi;
     }
-  })
+
+    let a = h0;//'01101010000010011110011001100111';
+    let b = h1;//'10111011011001111010111010000101';
+    let c = h2;//'00111100011011101111001101110010';
+    let d = h3;//'10100101010011111111010100111010';
+    let e = h4;//'01010001000011100101001001111111';
+    let f = h5;//'10011011000001010110100010001100';
+    let g = h6;//'00011111100000111101100110101011';
+    let h = h7;//'01011011111000001100110100011001';
+  
+    // compression loop
+    for(let i=0;i<64;i++){
+      let s1 = xor(xor(rotateR(e,6),rotateR(e,11)),rotateR(e,25));
+      let ch = xor(and(e,f),and(not(e),g));
+      let temp1 = binAdd(binAdd(binAdd(binAdd(h,s1),ch),k[i]),chunk[i]);
+      let s0 = xor(xor(rotateR(a,2),rotateR(a,13)),rotateR(a,22));
+      let maj = xor(xor(and(a,b),and(a,c)),and(b,c));
+      let temp2 = binAdd(s0,maj);
+
+      h = g;
+      g = f;
+      f = e;
+      e = binAdd(d,temp1);
+      d = c;
+      c = b;
+      b = a;
+      a = binAdd(temp1, temp2);
+    }
+
+    h0 = binAdd(h0,a);
+    h1 = binAdd(h1,b);
+    h2 = binAdd(h2,c);
+    h3 = binAdd(h3,d);
+    h4 = binAdd(h4,e);
+    h5 = binAdd(h5,f);
+    h6 = binAdd(h6,g);
+    h7 = binAdd(h7,h);
+
+  });// END CHUNK LOOPS
+
+  let value = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7
+  var hex = BigInt('0b'+value).toString(16);
+  return hex.toUpperCase()
 }
 
-let myWord = 'hello world'; 
-sha256(myWord)
+let myWord = 'je ne sais pas ce que jecrit mais cest pour un test'; 
+console.log(sha256(myWord))
